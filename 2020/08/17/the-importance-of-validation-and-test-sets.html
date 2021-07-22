@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>The Importance of Validation and Test Sets | Brandon Wolfson</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="The Importance of Validation and Test Sets" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="So you’re studying machine learning and keep hearing about validation and test sets. You know they’re important, but you’re not sure why. That’s what this article is about. Let’s dive in!" />
+<meta property="og:description" content="So you’re studying machine learning and keep hearing about validation and test sets. You know they’re important, but you’re not sure why. That’s what this article is about. Let’s dive in!" />
+<link rel="canonical" href="https://brandonwolfson.com/2020/08/17/the-importance-of-validation-and-test-sets.html" />
+<meta property="og:url" content="https://brandonwolfson.com/2020/08/17/the-importance-of-validation-and-test-sets.html" />
+<meta property="og:site_name" content="Brandon Wolfson" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-08-17T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://brandonwolfson.com/2020/08/17/the-importance-of-validation-and-test-sets.html","@type":"BlogPosting","headline":"The Importance of Validation and Test Sets","dateModified":"2020-08-17T00:00:00-05:00","datePublished":"2020-08-17T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://brandonwolfson.com/2020/08/17/the-importance-of-validation-and-test-sets.html"},"description":"So you’re studying machine learning and keep hearing about validation and test sets. You know they’re important, but you’re not sure why. That’s what this article is about. Let’s dive in!","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://brandonwolfson.com/feed.xml" title="Brandon Wolfson" /><link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Brandon Wolfson</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about/">About Me</a><a class="page-link" href="/projects/">Projects</a><a class="page-link" href="/search/">Search</a><a class="page-link" href="/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">The Importance of Validation and Test Sets</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2020-08-17T00:00:00-05:00" itemprop="datePublished">
+        Aug 17, 2020
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      5 min read
+    
+</span></p>
+
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>So you’re studying machine learning and keep hearing about validation and test sets. You know they’re important, 
+but you’re not sure <em>why</em>. That’s what this article is about. Let’s dive in!</p>
+
+<p><img src="/images/articles/importance-of-val-and-test-sets/data-split.png" alt="data-split" title="Splitting the data into train, validation and test sets." height="350px" /></p>
+
+<h2 id="why-are-validation-and-test-sets-important">Why are Validation and Test Sets Important?</h2>
+
+<p>Here’s the big picture: Validation sets help you prevent <strong>overfitting</strong> and test sets tell you if your model will <strong>generalize</strong> to new data. Let’s unpack that. Overfitting is when your model performs well on the data it trained on, but poorly on new data. A model is said to generalize when it performs similarly on both training data and new data.</p>
+
+<p>The whole point of training a model is to use it on new data (if we made an animal classifier that only worked on animals the model had previously seen, it wouldn’t be very useful!). We want a model that generalizes, which means avoiding overfitting is a key concern. But why does overfitting even happen in the first place?</p>
+
+<h2 id="why-does-overfitting-occur">Why Does Overfitting Occur?</h2>
+
+<p>When our model trains, it’s just learning to map inputs to outputs in the train set. Initially, it doesn’t know anything and makes terrible predictions. After seeing the data a few times though, it learns to pick out general features in the inputs that help it predict the outputs. Finally, with enough passes through the data, the model learns to map perfectly. It no longer has to rely on the general features it found earlier. Instead, it now knows exactly what each input in the training data looks like, and has memorized its corresponding output. Great, right?</p>
+
+<p>Not quite! The problem here is that our goal is different than the model’s goal! Our goal is to have a model that generalizes to <em>new</em> data, but the model’s goal is to perform perfectly on the <em>training</em> data! In other words, the model’s goal is to overfit! It doesn’t care about or even know about other data.</p>
+
+<p><img src="/images/articles/importance-of-val-and-test-sets/natural-progression-of-training.png" alt="natural-progression-of-training" title="Over the course of training, a model naturally progresses from underfitting -&gt; learning general features -&gt; overfitting." height="600px" /></p>
+
+<p>So how do we stop our model from overfitting? If we had another set of data that the model didn’t train on, we could periodically test its performance on that data. That would let us find the point when the model stopped learning general features (which help classify new data) and when the model started memorizing its training data. That’s exactly what a validation set is!</p>
+
+<h2 id="validation-sets-prevent-overfitting-on-the-training-set">Validation Sets Prevent Overfitting on the Training Set</h2>
+
+<p>By testing our model’s performance on a validation set after each epoch, we’re able to see when it starts to get worse. Right before this happens is when our model can generalize to new data the best! Not only that, we can use our validation set to adjust our other hyperparameters (learning rate, regularization, architecture, etc.), not just the number of training epochs, to get a model that can perform even better on the validation set! So a validation set gives us two key advantages:</p>
+
+<ol>
+  <li>We can see when our model stops generalizing and starts overfitting</li>
+  <li>We can tune the model’s hyperparameters so that it achieves better performance on the validation set before #1 happens</li>
+</ol>
+
+<p>Great, we’ve used our validation set to tune our hyperparameters. Now we know our model will generalize the best, right?</p>
+
+<p>Not quite! We can’t be sure how our model will perform on new data yet. Why? Your model tuned its parameters using feedback it got from the train set. This presented the opportunity for the model to overfit to the train set. But you tuned the model’s hyperparameters using feedback from the validation set. This means that you may have unknowingly caused the model to overfit to the validation set. The model might just be tuned to perform well on the validation set, but might not generalize to completely new data!</p>
+
+<p><img src="/images/articles/importance-of-val-and-test-sets/overfitting.png" alt="overfitting" title="Anytime you use feedback from the data to improve your model, you might introduce overfitting!" height="600px" /></p>
+
+<p>That’s where the test set comes in.</p>
+
+<h2 id="the-test-set-tells-if-you-overfit-on-the-validation-set">The Test Set Tells if You Overfit on the Validation Set</h2>
+
+<p>By testing the model’s performance on truly unseen data once we’re completely done tuning it, we get an accurate estimate of how it will perform in production!</p>
+
+<blockquote>
+  <h2 id="2-interesting-implications">2 Interesting Implications</h2>
+  <ol>
+    <li>We could still get an accurate estimate of how our model would perform in production without a validation set, using only a train and test set. However, this would be bad 
+because we’d lose the two advantages of the validation set. We wouldn’t know if our model was overfitting on the train set, which means any hyperparameter tuning would be 
+meaningless. We’d have no way to tell if it was making the model more general, or just making it overfit more.</li>
+    <li><strong>You can only test on the test set once!</strong> If you test your model on the test set and then go back and tune it to perform better, the test set becomes the same as the 
+validation set! You won’t be able to tell if any increase in performance is because of a more general model or because of overfitting to the test set! That’s why Kaggle has 
+the private leaderboard. Since they allow multiple submissions, people can tune their model to perform better on the public leaderboard. This introduces the potential of 
+overfitting to it. By withholding some of the test data for the private leaderboard, Kaggle can see which models generalize the best.</li>
+  </ol>
+</blockquote>
+
+<h2 id="how-should-you-pick-your-validation-and-test-sets">How Should You Pick Your Validation and Test Sets?</h2>
+<p>The way you pick what data goes into your validation and test sets is extremely important. If the data your model encounters in production is in some way fundamentally different than the data you had in your test set, then your test set won’t provide an accurate estimate of your model’s performance. The main principle to keep in mind is this: Pick data that are as similar as possible to the type of data your model will see in production (while preventing any overlap in data between the train, validation, and test sets). For a great write-up on this, check out Fast.ai co-founder Rachel Thomas’s article<a href="https://www.fast.ai/2017/11/13/validation-sets/">here</a>.</p>
+
+<p>Enjoy the article? Let me know your thoughts in the comments below! :)</p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="bwolfson97/website"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/2020/08/17/the-importance-of-validation-and-test-sets.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>The digital home of Brandon Wolfson.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/bwolfson97" title="bwolfson97"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/bw97" title="bw97"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/wolfson_brandon" title="wolfson_brandon"><svg class="svg-icon grey"><use xlink:href="/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
